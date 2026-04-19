@@ -70,6 +70,7 @@ func (app *Config) Authenticate(w http.ResponseWriter, a AuthPayload){
 	// call the service
 
 	request, err := http.NewRequest("POST", "http://authentication-service/authenticate", bytes.NewBuffer(jsonData))
+	//En Docker Compose, los contenedores se comunican entre sí usando el nombre del servicio como si fuera un dominio en la red, y se comunican a través del puerto interno (que en tu servicio de auth es el 80).
 	if err != nil {
 		app.errorJSON(w, err)
 		return
