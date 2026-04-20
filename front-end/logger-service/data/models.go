@@ -72,3 +72,66 @@ func (l *LogEntry) All() ([]*LogEntry, error) {
 
 	return logs, nil
 }
+
+func (l *LogEntry) GetOne(id string) (*LogEntry, error){
+	ctx, cancel :=  context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	
+	collection := client.Database("logs").Collection("logs")
+
+	// the next thing is to convert the id from the parameter to the correct format (bson)
+
+	docID, err = primitive.ObjectIDFromHex(id) // convert the id from the parameter to the correct format (bson)
+	if err != nil{
+		return nil, err
+	}	
+
+	var entry LogEntry
+
+	err = collection.FindOne(ctx, bson.D{{"_id", docID}}).Decode(&entry) // find one document in the collection
+	if err != nil{
+		return nil, err
+	}
+
+	return &entry, nil
+}
+
+func (l *LogEntry) DroptCollection() error{ // drop the collection
+	ctx, cancel :=  context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	
+	collection := client.Database("logs").Collection("logs")
+
+	if err := collection.Drop(ctx); err != nil{
+		return err
+	}
+
+	return nil
+}
+
+func (l *LogEntry) Update()(*mongo.UpdateResult,error){
+	ctx, cancel :=  context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	
+	collection := client.Database("logs").Collection("logs")
+
+	docID, err = primitive.ObjectIDFromHex(l.ID) // convert the id from the parameter to the correct format (bson)
+	if err != nil{
+		return nil, err
+	}	
+	
+	result, erre := collection.UpdateOne(
+		ctx, 
+		bson.D{{"_id", docID}}, 
+		bson.D{
+			{"set", bson.D{
+				{"name", l.Name}, 
+				{"data", l.Data}, 
+				{"updated_at", time.Now()},
+			}},
+	})
+	if err != nil{
+		return nil, err
+	}
+	return result, nil
+}
