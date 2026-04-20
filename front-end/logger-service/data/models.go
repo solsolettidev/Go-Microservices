@@ -1,5 +1,16 @@
 package data
 
+import(
+	"context"
+	"log"
+	"time"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
 var client *mongo.Client
 
 func New(mongo *mongo.Client) Models {
@@ -28,7 +39,7 @@ type LogEntry struct{
 func (l *LogEntry) Insert(entry LogEntry) error {
 	collection := client.Database("logs").Collection("logs") // create a collection called logs in the database called logs, mongo creates it if it doesn't exist
 
-	_, err := collection.InsertOne(context.TODO(), Logentry{ // insert the entry into the collection, context.TODO() is used to create a context that will be used to cancel the operation if it takes too long
+	_, err := collection.InsertOne(context.TODO(), LogEntry{ // insert the entry into the collection, context.TODO() is used to create a context that will be used to cancel the operation if it takes too long
 		Name: entry.Name,
 		Data: entry.Data,
 		CreatedAt: time.Now(),
@@ -51,7 +62,7 @@ func (l *LogEntry) All() ([]*LogEntry, error) {
 	opts := options.Find()
 	opts.SetSort(bson.D{{"created_at", -1}}) // sort by created_at in descending order
 
-	cursor, err := collection.Find(context.TODO(), bson.D{{}, opts}) // find all documents in the collection
+	cursor, err := collection.Find(context.TODO(), bson.D{}, opts) // find all documents in the collection
 	if err != nil{
 		log.Println("Finding all docs error:", err)
 		return nil, err
@@ -81,7 +92,7 @@ func (l *LogEntry) GetOne(id string) (*LogEntry, error){
 
 	// the next thing is to convert the id from the parameter to the correct format (bson)
 
-	docID, err = primitive.ObjectIDFromHex(id) // convert the id from the parameter to the correct format (bson)
+	docID, err := primitive.ObjectIDFromHex(id) // convert the id from the parameter to the correct format (bson)
 	if err != nil{
 		return nil, err
 	}	
@@ -115,12 +126,12 @@ func (l *LogEntry) Update()(*mongo.UpdateResult,error){
 	
 	collection := client.Database("logs").Collection("logs")
 
-	docID, err = primitive.ObjectIDFromHex(l.ID) // convert the id from the parameter to the correct format (bson)
+	docID, err := primitive.ObjectIDFromHex(l.ID) // convert the id from the parameter to the correct format (bson)
 	if err != nil{
 		return nil, err
 	}	
 	
-	result, erre := collection.UpdateOne(
+	result, err := collection.UpdateOne(
 		ctx, 
 		bson.D{{"_id", docID}}, 
 		bson.D{

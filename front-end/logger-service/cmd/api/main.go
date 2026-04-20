@@ -2,8 +2,10 @@ package main
 import(
 	"context"
 	"log"
-	"logger-service/data"
+	"log-service/data"
 	"time"
+	"net/http"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo" // read documentation for connection instructions
@@ -12,7 +14,7 @@ import(
 const (
 	webPort = "80"
 	rpcPont = "5001"
-	mongoURL = "mongodb://mongo:27017"
+	mongoURL = "mongodb://localhost:27017"
 	gRpcPort = "50001"
 )
 
@@ -48,11 +50,20 @@ func main() {
 
 	// start web server
 
-	go app.serve() // go allows us to run the web server in a separate thread so that the main thread can continue to run
+	// go app.serve() // go allows us to run the web server in a separate thread so that the main thread can continue to run
+	log.Println("Starting web server on port", webPort)
+	srv:= &http.Server{
+		Addr: fmt.Sprintf(":%s", webPort),
+		Handler: app.routes(),
+	}
 
+	err = srv.ListenAndServe()
+	if err != nil {
+		log.Panic(err)
+	}
 }
 
-func (app *Config) serve(){ // this will be the web server
+/*func (app *Config) serve(){ // this will be the web server
 	srv:= &http.Server{
 		Addr: fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
@@ -62,7 +73,7 @@ func (app *Config) serve(){ // this will be the web server
 	if err != nil {
 		log.Panic(err)
 	}
-}
+}*/
 
 func connectToMongo()(*mongo.Client, error){
 	// create connection options
@@ -77,6 +88,8 @@ func connectToMongo()(*mongo.Client, error){
 	if err != nil {
 		return nil, err
 	}
+
+	log.Println("Connected to MongoDB!")
 
 	return c, nil
 }
