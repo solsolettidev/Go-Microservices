@@ -1,20 +1,25 @@
 package main
 import(
+	"context"
 	"log"
+	"logger-service/data"
+	"time"
 
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo" // read documentation for connection instructions
 )
 
 const (
 	webPort = "80"
 	rpcPont = "5001"
-	mongoURL = "mongodb://,pmgp:27017"
+	mongoURL = "mongodb://mongo:27017"
 	gRpcPort = "50001"
 )
 
 var client *mongo.Client
 
 type Config struct {
+	Models data.Models
 	
 }
 
@@ -36,6 +41,27 @@ func main() {
 			panic(err)
 		}
 	} ()
+
+	app := Config{
+		Models: data.New(client),
+	}
+
+	// start web server
+
+	go app.serve() // go allows us to run the web server in a separate thread so that the main thread can continue to run
+
+}
+
+func (app *Config) serve(){ // this will be the web server
+	srv:= &http.Server{
+		Addr: fmt.Sprintf(":%s", webPort),
+		Handler: app.routes(),
+	}
+
+	err := srv.ListenAndServe()
+	if err != nil {
+		log.Panic(err)
+	}
 }
 
 func connectToMongo()(*mongo.Client, error){
