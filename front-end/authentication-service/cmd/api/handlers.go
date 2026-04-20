@@ -4,6 +4,8 @@ import(
 	"errors"
 	"net/http"
 	"fmt"
+	"bytes"
+	"encoding/json"
 )
 
 func(app *Config) Authenticate(w http.ResponseWriter, r *http.Request){
@@ -32,8 +34,7 @@ func(app *Config) Authenticate(w http.ResponseWriter, r *http.Request){
 	}
 
 	// log authentication
-
-	err = app.logRequest(w, "authentication", fmt.Sprintf("User %s logged in", user.Email)) // this is how we log requests to the logger service
+	err = app.logRequest("authentication", fmt.Sprintf("User %s logged in", user.Email)) // this is how we log requests to the logger service
 	if err != nil {
 		app.errorJSON(w, err)
 		return

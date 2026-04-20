@@ -63,7 +63,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request){
 
 	switch requestPayload.Action {
 	case "auth":
-		app.Authenticate(w, requestPayload.Auth)
+		app.authenticate(w, requestPayload.Auth)
 	case "log":
 		app.logItem(w, requestPayload.Log)
 	default:
@@ -126,11 +126,11 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload){
 	}
 	defer response.Body.Close()
 
-	// make sure we get bsck the correct status code
-	if response.StatusCode != http.StatusUnauthorized{
+	// make sure we get back the correct status code
+	if response.StatusCode == http.StatusUnauthorized || response.StatusCode == http.StatusBadRequest {
 		app.errorJSON(w, errors.New("invalid credentials"))
 		return
-	}else if response.StatusCode != http.StatusAccepted{
+	} else if response.StatusCode != http.StatusAccepted && response.StatusCode != http.StatusOK {
 		app.errorJSON(w, errors.New("error calling auth service"))
 		return
 	}
