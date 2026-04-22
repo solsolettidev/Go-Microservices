@@ -25,5 +25,6 @@ func (app *Config) routes() http.Handler { // func that returns an http.handler
 	mux.Use(middleware.Heartbeat("/ping")) 
 	// this is a healthcheck endpoint, it is used to check if the server is alive, if it is it will return a 200 status code (enterying the url /ping)
 
+	mux.Post("/send", app.SendMail) // path to send mail that goes to the handlers.
 	return mux
 }
