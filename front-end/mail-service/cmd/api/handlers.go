@@ -21,7 +21,7 @@ func (app *Config) SendMail(w http.ResponseWriter, r *http.Request){ // handler 
 		return
 	}
 
-	msg := mail.Message{
+	msg := Message{
 		To:      requestPayload.To,
 		From: requestPayload.From,
 		Subject: requestPayload.Subject,

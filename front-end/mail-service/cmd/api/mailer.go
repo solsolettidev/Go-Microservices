@@ -16,7 +16,7 @@ type Mail struct {
 	UserName string
 	Password string
 	Encryption string
-	FromAdrdress string
+	FromAddress string
 	FromName string
 }
 
@@ -32,11 +32,11 @@ type Message struct {
 
 func (m *Mail) SendSMTPMessage(msg Message) error{
 	if msg.From == ""{
-		msf.From = m.FromAddress
+		msg.From = m.FromAddress
 	}
 
 	if msg.FromName == ""{
-		msf.FromName = m.FromName
+		msg.FromName = m.FromName
 	}
 
 	data := map[string]any{

@@ -1,5 +1,12 @@
 package main
 
+import (
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"fmt"
+)
 
 type Config struct { // our application configuration (where we store the config from .env file)
 	Mailer Mail
@@ -34,7 +41,7 @@ func createMail() Mail {
 		Domain: os.Getenv("MAIL_DOMAIN"),
 		Host: os.Getenv("MAIL_HOST"),
 		Port: port,
-		Username: os.Getenv("MAIL_USERNAME"),
+		UserName: os.Getenv("MAIL_USERNAME"),
 		Password: os.Getenv("MAIL_PASSWORD"),
 		Encryption: os.Getenv("MAIL_ENCRYPTION"),
 		FromAddress: os.Getenv("FROM_ADDRESS"),
