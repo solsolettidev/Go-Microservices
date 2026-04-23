@@ -1,8 +1,8 @@
 package main
 
 import (
+	"log"
 	"net/http"
-	
 )
 
 func (app *Config) SendMail(w http.ResponseWriter, r *http.Request){ // handler to send mail ()
@@ -17,6 +17,7 @@ func (app *Config) SendMail(w http.ResponseWriter, r *http.Request){ // handler 
 
 	err := app.readJSON(w, r, &requestPayload)
 	if err != nil {
+		log.Println("Error reading JSON:", err)
 		app.errorJSON(w, err, http.StatusBadRequest)
 		return
 	}
@@ -30,6 +31,7 @@ func (app *Config) SendMail(w http.ResponseWriter, r *http.Request){ // handler 
 	
 	err = app.Mailer.SendSMTPMessage(msg)
 	if err != nil {
+		log.Println("Error sending mail:", err)
 		app.errorJSON(w, err, http.StatusInternalServerError)
 		return
 	}

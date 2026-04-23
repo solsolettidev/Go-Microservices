@@ -14,6 +14,9 @@ FROM alpine:latest
 
 RUN mkdir /app
 
-COPY --from=builder /app/mailApp /app
+WORKDIR /app
 
-CMD ["/app/mailApp"]
+COPY --from=builder /app/mailApp .
+COPY --from=builder /app/templates ./templates
+
+CMD ["./mailApp"]

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"html/template"
+	"log"
 	"time"
 	"github.com/vanng822/go-premailer/premailer"
 	mail "github.com/xhit/go-simple-mail/v2"
@@ -67,6 +68,7 @@ func (m *Mail) SendSMTPMessage(msg Message) error{
 
 	smtpClient, err := server.Connect()
 	if err != nil {
+		log.Println("Error connecting to server:", err)
 		return err
 	}
 
@@ -83,6 +85,7 @@ func (m *Mail) SendSMTPMessage(msg Message) error{
 
 	err = email.Send(smtpClient)
 	if err != nil {
+		log.Println("Error sending mail:", err)
 		return err
 	}
 
